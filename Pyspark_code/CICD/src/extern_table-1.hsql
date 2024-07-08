@@ -1,0 +1,24 @@
+CREATE External TABLE data-bank (
+	age int,
+	job string,
+	marital string,
+	education string,
+	default string,
+	balance int,
+	housing string,
+	loan string,
+	contract int,
+	day int,
+	month string,
+	duration int,
+	campaign int,
+	pdays int,
+	previous int,
+	poutcome string,
+	y string
+
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE
+LOCATION "/tmp/catbd125/Saeed/project/bank"

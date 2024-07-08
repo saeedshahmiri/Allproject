@@ -1,0 +1,67 @@
+Partitioning in Hive
+Partitioning divides a large table into smaller, manageable pieces, called partitions. Hive creates separate files or directories for each partition, based on the values of partition columns.
+
+Benefits of Partitioning:
+Query Performance: Queries can be faster because they can skip partitions that do not match the query criteria.
+Manageability: Easier to manage and maintain large datasets.
+Efficient Data Loading: Data loading operations can be faster as they can be directed to specific partitions.
+
+CREATE TABLE partitioned_sales (
+    id INT,
+    product STRING,
+    amount FLOAT
+)
+PARTITIONED BY (year INT, month INT)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+STORED AS TEXTFILE;
+
+
+-- Load data 
+LOAD DATA INPATH '/tmp/catbd125/uttam/part.csv' INTO TABLE partitioned_sales;
+PARTITION (year=2024, month=1);
+
+-- Query data for January 2024
+SELECT * FROM partitioned_sales WHERE year=2024 AND month=1;
+
+
+Bucketing in Hive
+Bucketing distributes data into fixed number of buckets (or files) based on the hash value of a bucketing column. Each bucket is stored as a separate file, which can help in optimizing queries that involve joins and aggregations.
+
+Benefits of Bucketing:
+Improved Query Performance: Helps in efficiently querying and joining tables by limiting the data scanned.
+Efficient MapReduce: Bucketing can lead to more efficient MapReduce jobs by enabling optimizations like sorted buckets.
+
+CREATE TABLE bucketed_sales (
+    id INT,
+    product STRING,
+    amount FLOAT,
+    year INT, 
+    month INT
+)
+CLUSTERED BY (id) INTO 10 BUCKETS;
+
+
+INSERT OVERWRITE TABLE bucketed_sales
+SELECT * FROM partitioned_sales;
+
+
+Using Partitioning and Bucketing Together
+You can combine partitioning and bucketing to leverage the benefits of both techniques. For example, you might partition a table by date and bucket it by user ID.
+
+Example:
+Create a Partitioned and Bucketed Table:
+
+CREATE TABLE partitioned_bucketed_sales (
+    id INT,
+    product STRING,
+    amount FLOAT
+)
+PARTITIONED BY (year INT, month INT)
+CLUSTERED BY (id) INTO 10 BUCKETS
+STORED AS ORC;
+
+
+INSERT OVERWRITE TABLE partitioned_bucketed_sales
+SELECT * FROM partitioned_sales;
+
